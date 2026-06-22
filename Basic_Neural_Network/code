@@ -1,0 +1,64 @@
+#가장 기본적인 Neural Network
+import math
+
+w1 = 2.74
+w2 = -1.13
+b1 = 0
+b2 = 0
+w3 = 0.36
+w4 = 0.63
+b3 = 0
+#low -> 0, mid -> 0.5, max -> 1 // x축
+low_dos = 0
+mid_dos = 1
+max_dos = 0
+
+def safe_exp(x):
+    # 값이 너무 커지면 math.exp가 OverflowError를 내므로 안전 범위로 자른다
+    if x > 709:
+        x = 709
+    elif x < -709:
+        x = -709
+    return math.exp(x)
+
+def Softplus(x):
+    return math.log(1+safe_exp(x))
+def Predicte(x) :
+    return w3*Softplus(x*w1+b1) + w4*Softplus(x*w2+b2) + b3
+def Residual(observe, predicted) :
+    return observe-predicted
+def dSoftplus(x) :
+    return 1/(1+(safe_exp(-x)))
+
+
+
+for _ in range(1000000):
+    predicted0 = w3*Softplus(0*w1 + b1) + w4*Softplus(0*w2+b2) + b3
+    predicted0_5 = w3*Softplus(0.5*w1 + b1) + w4*Softplus(0.5*w2+b2) + b3
+    predicted1 = w3*Softplus(1*w1 + b1) + w4*Softplus(1*w2+b2) + b3
+
+ 
+    step_size_w1 = 0.1*  -1 *(  2*Residual(1, Predicte(0.5))*w3*dSoftplus(0.5*w1 + b1)*0.5 + 2*Residual(0, Predicte(1)*w3*dSoftplus(1*w1 + b1)*1))
+
+    step_size_w2 = 0.1* -1 *(  2*Residual(1, Predicte(0.5))*w4*dSoftplus(0.5*w2 + b2)*0.5 + 2*Residual(0, Predicte(1)*w4*dSoftplus(1*w2 + b2)*1))
+
+    step_size_b1 = 0.1 * -1 *(2*Residual(0, Predicte(0))*w3*dSoftplus(0*w1 + b1)*1 + 2*Residual(1, Predicte(0.5))*w3*dSoftplus(0.5*w1 + b1)*1 + 2*Residual(0, Predicte(1)*w3*dSoftplus(1*w1 + b1)*1))
+
+    step_size_b2 = 0.1 * -1 *(2*Residual(0, Predicte(0))*w4*dSoftplus(0*w2 + b2)*1 + 2*Residual(1, Predicte(0.5))*w4*dSoftplus(0.5*w2 + b2)*1 + 2*Residual(0, Predicte(1)*w4*dSoftplus(1*w2 + b2)*1))
+
+    step_size_w3 = 0.1* -1 *(2*Residual(0, Predicte(0))*Softplus(0*w1 + b1) + 2*Residual(1, Predicte(0.5))*Softplus(0.5*w1 + b1) + 2*Residual(0, Predicte(1)*Softplus(1*w1 + b1)))
+
+    step_size_w4 = 0.1*  -1 *(2*Residual(0, Predicte(0))*Softplus(0*w2 + b2) + 2*Residual(1, Predicte(0.5))*Softplus(0.5*w2 + b2) + 2*Residual(0, Predicte(1)*Softplus(1*w2 + b2)))
+
+    step_size_b3 = 0.1* -1*(2*Residual(0, Predicte(0)) + 2*Residual(1, Predicte(0.5))+ 2*Residual(0, Predicte(1))) * 1
+
+    w1 -= step_size_w1
+    w2 -= step_size_w2
+    b1 -= step_size_b1
+    b2 -= step_size_b2
+    w3 -= step_size_w3
+    w4 -= step_size_w4
+    b3 -= step_size_b3
+
+print(w1, w2, b1, b2, w3, w4, b3)
+    
