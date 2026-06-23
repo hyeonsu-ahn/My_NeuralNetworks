@@ -1,0 +1,28 @@
+import numpy as np
+
+def ReLU(x) :
+    if x < 0 :
+        return 0
+    else :
+        return x
+
+input_value = np.array(list(map(int, input().split())))
+#input weight, bias는 활성화함수 개수 * input value 개수 만큼 있음
+input_weight = np.array(list(map(int, input().split())))
+input_bias = np.array(list(map(int, input().split())))
+output_weight = np.array(list(map(int, input().split())))
+output_bias = int(input())
+#특정 Input을 넣으면 값을 예측해줌.
+def Predicte():
+    x_array = np.array()
+    for i in range(len(input_value)) :
+        x_array += input_value[i] * input_weight
+    x_array += input_bias
+    y_array = np.array()
+    for i in range(len(x_array)):
+        np.append(y_array, ReLU(x_array[i]))
+    y_array *= output_weight
+    return ReLU(np.sum(y_array) + output_bias)
+
+print(Predicte())
+
