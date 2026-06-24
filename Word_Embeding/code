@@ -1,0 +1,39 @@
+import numpy as np
+#활성화 함수는 2개만 사용. 학습문장은 Troll 2 is great!, Gymkata is great!
+#각 인덱스 순서대로 "Troll 2", "is", "great!", "Gymkata"
+first_embeding = np.array([2.02,-2.17,-2.13,1.73])
+second_embeding = np.array([1.98,2.43,-2.23,1.99])
+
+#활성화 함수
+class act_function() :
+    def __init__(self, weight):
+        #weight 모든 출력토큰에 연결된 가중치
+        self.weight = weight
+    def input_calculate(self, x, weight) :
+        #x 는 입력토큰들, weight는 각 토큰과 이어져있는 n번째 가중치. 출력은 정수.
+        return np.sum(x*weight)
+    def out_calculate(self, y):
+        #y는 입력토큰들과 임베딩값을 곱한것들을 모두더한 합. 출력은 배열
+        return y*self.weight
+
+def SoftMax(arr) :
+    #분모구하기
+    temp_arr = np.array([])
+    denum = 0
+    for i in range(len(arr)) :
+        denum += np.exp(arr[i])
+    for i in range(len(arr)) :
+        temp_arr = np.append(temp_arr, np.divide(np.exp(arr[i]), denum))
+    return temp_arr
+
+#각 인덱스 순서대로 "Troll 2", "is", "great!", "Gymkata"
+token = [np.array([1,0,0,0]),np.array([0,1,0,0]),np.array([0,0,1,0]), np.array([0,0,0,1])]
+act1 = act_function(np.array([1.16, 3.22, -1.67, -1.69]))
+act2 = act_function(np.array([-1.72, 1.32, 0.86, -3.39]))
+
+result = np.array([])
+for i in range(len(token)) :
+    x = token[i]
+    result = SoftMax(act1.out_calculate(act1.input_calculate(x, first_embeding)) + \
+                    act2.out_calculate(act2.input_calculate(x, second_embeding)))
+    print(result)
